@@ -1,30 +1,31 @@
 import React from "react";
-import QrModal from "./Qr";
 
-export default function LinkList({ links }) {
-  if (!links.length) {
-    return <p className="mt-6 text-gray-500">No links yet. Try shortening one!</p>;
+export default function LinkList({ links, onClickLink }) {
+  if (links.length === 0) {
+    return <p className="no-data">No shortened URLs yet.</p>;
   }
 
   return (
-    <div className="mt-6 w-full max-w-lg space-y-4">
-      {links.map((link, i) => (
-        <div
-          key={i}
-          className="bg-white p-4 rounded-xl shadow-md flex justify-between items-center"
-        >
-          <div>
-            <p className="text-sm text-gray-700">{link.original}</p>
+    <div className="link-list">
+      {links.map((link, index) => (
+        <div key={index} className="link-card">
+          <p>
+            <strong>Shortened:</strong>{" "}
             <a
-              href={link.short}
+              href={link.original}
               target="_blank"
-              rel="noreferrer"
-              className="text-indigo-600 font-semibold hover:underline"
+              rel="noopener noreferrer"
+              onClick={() => onClickLink(link.short)}
             >
-              {link.short}
+              {window.location.origin}/{link.short}
             </a>
-          </div>
-          <QrModal url={link.short} />
+          </p>
+          <p>
+            <strong>Original:</strong>{" "}
+            <a href={link.original} target="_blank" rel="noopener noreferrer">
+              {link.original}
+            </a>
+          </p>
         </div>
       ))}
     </div>

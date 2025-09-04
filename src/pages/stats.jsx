@@ -2,20 +2,10 @@ import React, { useEffect, useState } from "react";
 
 export default function Stats() {
   const [links, setLinks] = useState([]);
-  const fetchStats = async () => {
-    try {
-      const res = await fetch("http://localhost:3000/stats");
-      const data = await res.json();
-      setLinks(data);
-    } catch (err) {
-      console.error("Error fetching stats:", err);
-    }
-  };
 
   useEffect(() => {
-    fetchStats();
-    const interval = setInterval(fetchStats, 5000);
-    return () => clearInterval(interval);
+    const saved = Object.values(localStorage).map((val) => JSON.parse(val));
+    setLinks(saved);
   }, []);
 
   return (

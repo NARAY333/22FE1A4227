@@ -1,23 +1,61 @@
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import Home from "./pages/home";
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
+import UrlForm from "./components/Url";
+import LinkList from "./components/linklist";
 import Stats from "./pages/stats";
+import { useState } from "react";
 
-function App() {
+function Navbar() {
+  const location = useLocation();
   return (
-    <Router>
-      <div className="p-4">
-        <nav className="flex gap-4 mb-4">
-          <Link to="/" className="text-indigo-600 font-semibold">Home</Link>
-          <Link to="/stats" className="text-indigo-600 font-semibold">Statistics</Link>
-        </nav>
-
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/stats" element={<Stats />} />
-        </Routes>
-      </div>
-    </Router>
+    <div className="navbar">
+      <Link to="/" className={location.pathname === "/" ? "active" : ""}>
+        Home
+      </Link>
+      <Link to="/stats" className={location.pathname === "/stats" ? "active" : ""}>
+        Statistics
+      </Link>
+    </div>
   );
 }
 
-export default App;
+export default function App() {
+  const [links, setLinks] = useState([]);
+
+  const addLink = (link) => {
+    setLinks([...links, link]);
+  };
+
+  const recordClick = (short) => {
+    setLinks((prev) =>
+      prev.map((link) =>
+        link.short === short
+          ? {
+              ...link,
+              clicks: link.clicks + 1,
+              details: [
+                ...link.details,
+                {
+                  time: Date.now(),
+                  referrer: document.referrer || "Direct",
+                  location: "Unknown",
+                },
+              ],
+            }
+          : link
+      )
+    );
+  };
+
+  return (
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<>
+          <UrlForm onAdd={addLink} />
+          <LinkList links={links} onClickLink={recordClick} />
+        </>} />
+        <Route path="/stats" element={<Stats links={links} />} />
+      </Routes>
+    </Router>
+  );
+}
